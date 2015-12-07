@@ -1,0 +1,5 @@
+TODO
+---
+- track local files uploaded with state: pending, done, verified by glacier inventory
+- add sync to upload files in local dir not yet in inventory
+- add inventory file itself to inventory on initial run
