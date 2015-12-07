@@ -152,14 +152,14 @@ def sync(vaultName):
     # glacier = boto3.resource('glacier')
     # vault = glacier.Vault(config['accountId'], vaultName)
     inventory = Inventory('/home/iolsen/test_pyback')
-    pp(inventory.entries)
+    pp(inventory._entries)
 
     inventory.save()
 
 # perform_inventory(config['vaultName'])
-list_jobs(config['vaultName'])
+# list_jobs(config['vaultName'])
 # fetch_inventory(config['vaultName'], 'WzsxmkG8F0Vca-cxMNuqkBCxgpHP4a-aHaGW2a5bw2yG_MlNKOittFhg2sJEiADSafdZsBIWPNEMQUejNVqDYHc6tK2z')
 
 # upload_file(config['vaultName'], config['filePath'])
 
-# sync(config['vaultName'])
+sync(config['vaultName'])
