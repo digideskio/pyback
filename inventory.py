@@ -29,11 +29,11 @@ class Inventory:
             json.dump(self._entries, outfile, cls=EnumEncoder)
 
 
-    def set_state(fileName, new_state):
+    def set_state(self, fileName, new_state):
         self._entries[fileName]['state'] = new_state
 
 
-    def get_state(fileName):
+    def get_state(self, fileName):
         return self._entries[fileName]['state']
 
 

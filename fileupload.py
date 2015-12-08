@@ -10,13 +10,24 @@ class FileUpload:
         self._filePath = filePath
         self._vaultName = vaultName
         self._fileName = os.path.basename(filePath)
+        self._fileSizeBytes = os.path.getsize(self._filePath)
+        self._partSize = get_best_part_size(self._fileSizeBytes)
+        self._partNumUploading = 0
+
+
+    def formattedFileSize(self):
+        if not hasattr(self, '_formattedFileSize'):
+            self._formattedFileSize = cli.format_filesize(self._fileSizeBytes)
+        return self._formattedFileSize
+
+
+    def formattedPartSize(self):
+        if not hasattr(self, '_formattedPartSize'):
+            self._formattedPartSize = cli.format_filesize(self._partSize, 0)
+        return self._formattedPartSize
+
 
     def upload(self, client):
-
-        self._fileSizeBytes = os.path.getsize(self._filePath)
-        self._partSize = self._get_best_part_size()
-        print '%s is %d MB. Using part size of %d MB.\n' % (
-            self._fileName, self._fileSizeBytes/1024/1024, self._partSize/1024)
 
         self._upload = client.initiate_multipart_upload(
             vaultName=self._vaultName,
@@ -25,8 +36,8 @@ class FileUpload:
 
         treehash = TreeHash()
         partBegin = 0
+        self._partNumUploading = 0
         with open(self._filePath, "rb") as f:
-            self._startTime = time.time()
             while partBegin < self._fileSizeBytes:
                 partEnd = partBegin + self._partSize - 1
                 if partEnd > self._fileSizeBytes:
@@ -35,14 +46,24 @@ class FileUpload:
                 part = f.read(self._partSize)
                 treehash.update(part)
 
+                if partBegin == 0:
+                    self._startTime = time.time()
                 self._upload_part(client, part, partBegin, partEnd)
                 partBegin = partEnd + 1
+                self._partNumUploading += 1
 
         response = client.complete_multipart_upload(
             vaultName=self._vaultName,
             uploadId=self._upload['uploadId'],
             archiveSize=str(self._fileSizeBytes),
             checksum=treehash.hexdigest())
+
+        cli.cli_progress(self._fileName,
+            self.formattedFileSize(),
+            self.formattedPartSize(),
+            self._startTime,
+            self._fileSizeBytes-1,
+            self._fileSizeBytes-1)
 
         return response
 
@@ -53,10 +74,16 @@ class FileUpload:
                      partBegin,
                      partEnd):
 
+        cli.cli_progress(self._fileName,
+            self.formattedFileSize(),
+            self.formattedPartSize(),
+            self._startTime,
+            partBegin,
+            self._fileSizeBytes-1)
+
         for upload_attempt in range(0, 2):
             # print 'Uploading bytes %d through %d (%d%%)...' % (
             #     partBegin, partEnd, float(partEnd)/(self._fileSizeBytes-1)*100)
-            cli.cli_progress(self._fileName, self._startTime, partEnd, self._fileSizeBytes-1)
             try:
                 response = client.upload_multipart_part(
                     vaultName=self._vaultName,
@@ -70,13 +97,13 @@ class FileUpload:
 
             print "\nFAILED"
 
-    def _get_best_part_size(self):
-        # We want the smallest possible part size. Maximum parts is 10,000.
-        # So we find the first part size larger than file_len/10,000.
-        targetSize = self._fileSizeBytes / 10000
-        self._partSize = 1048576  # min size 1 MB
-        while self._partSize < targetSize:
-            self._partSize *= 2
-            if self._partSize > targetSize or self._partSize == 4294967296:  # max size 4GB
-                break
-        return self._partSize
+def get_best_part_size(fileSizeBytes):
+    # We want the smallest possible part size. Maximum parts is 10,000.
+    # So we find the first part size larger than file_len/10,000.
+    targetSize = fileSizeBytes / 10000
+    partSize = 1048576  # min size 1 MB
+    while partSize < targetSize:
+        partSize *= 2
+        if partSize > targetSize or partSize == 4294967296:  # max size 4GB
+            break
+    return partSize

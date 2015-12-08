@@ -50,8 +50,8 @@ def sync(vaultName):
 
 # perform_inventory(config['vaultName'])
 # list_jobs(config['vaultName'])
-fetch_inventory(config['vaultName'], '-YDD4AVvtcn6rn7zEYz8SF2HzNdLqqIhRnduONtSTz40jOBfAvIvycrfGJNijSefJHDS8D8A9tOCNxv6akFckF81Z493')
+# fetch_inventory(config['vaultName'], '-YDD4AVvtcn6rn7zEYz8SF2HzNdLqqIhRnduONtSTz40jOBfAvIvycrfGJNijSefJHDS8D8A9tOCNxv6akFckF81Z493')
 
-# upload_file(config['filePath'])
+upload_file(config['filePath'])
 
 # sync(config['vaultName'])
