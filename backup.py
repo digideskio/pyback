@@ -1,7 +1,6 @@
 from fileupload import FileUpload
 from inventory import Inventory
 import boto3
-import botocore
 import cli
 import json
 import yaml
@@ -9,6 +8,7 @@ import yaml
 
 config = yaml.safe_load(open('config.yaml'))
 client = boto3.client('glacier')
+
 
 def upload_file(filePath):
     file_upload = FileUpload(config['vaultName'], filePath)
@@ -50,7 +50,8 @@ def sync(vaultName):
 
 # perform_inventory(config['vaultName'])
 # list_jobs(config['vaultName'])
-# fetch_inventory(config['vaultName'], '-YDD4AVvtcn6rn7zEYz8SF2HzNdLqqIhRnduONtSTz40jOBfAvIvycrfGJNijSefJHDS8D8A9tOCNxv6akFckF81Z493')
+# fetch_inventory(config['vaultName'],
+# '-YDD4AVvtcn6rn7zEYz8SF2HzNdLqqIhRnduONtSTz40jOBfAvIvycrfGJNijSefJHDS8D8A9tOCNxv6akFckF81Z493')
 
 upload_file(config['filePath'])
 

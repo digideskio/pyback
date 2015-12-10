@@ -4,6 +4,7 @@ import cli
 import os
 import time
 
+
 class FileUpload:
 
     def __init__(self, vaultName, filePath):
@@ -14,18 +15,15 @@ class FileUpload:
         self._partSize = get_best_part_size(self._fileSizeBytes)
         self._partNumUploading = 0
 
-
     def formattedFileSize(self):
         if not hasattr(self, '_formattedFileSize'):
             self._formattedFileSize = cli.format_filesize(self._fileSizeBytes)
         return self._formattedFileSize
 
-
     def formattedPartSize(self):
         if not hasattr(self, '_formattedPartSize'):
             self._formattedPartSize = cli.format_filesize(self._partSize, 0)
         return self._formattedPartSize
-
 
     def upload(self, client):
 
@@ -59,14 +57,13 @@ class FileUpload:
             checksum=treehash.hexdigest())
 
         cli.cli_progress(self._fileName,
-            self.formattedFileSize(),
-            self.formattedPartSize(),
-            self._startTime,
-            self._fileSizeBytes-1,
-            self._fileSizeBytes-1)
+                         self.formattedFileSize(),
+                         self.formattedPartSize(),
+                         self._startTime,
+                         self._fileSizeBytes-1,
+                         self._fileSizeBytes-1)
 
         return response
-
 
     def _upload_part(self,
                      client,
@@ -75,15 +72,16 @@ class FileUpload:
                      partEnd):
 
         cli.cli_progress(self._fileName,
-            self.formattedFileSize(),
-            self.formattedPartSize(),
-            self._startTime,
-            partBegin,
-            self._fileSizeBytes-1)
+                         self.formattedFileSize(),
+                         self.formattedPartSize(),
+                         self._startTime,
+                         partBegin,
+                         self._fileSizeBytes-1)
 
         for upload_attempt in range(0, 2):
             # print 'Uploading bytes %d through %d (%d%%)...' % (
-            #     partBegin, partEnd, float(partEnd)/(self._fileSizeBytes-1)*100)
+            #     partBegin, partEnd,
+            #     float(partEnd)/(self._fileSizeBytes-1)*100)
             try:
                 response = client.upload_multipart_part(
                     vaultName=self._vaultName,
@@ -96,6 +94,7 @@ class FileUpload:
                 print "Retrying..."
 
             print "\nFAILED"
+
 
 def get_best_part_size(fileSizeBytes):
     # We want the smallest possible part size. Maximum parts is 10,000.

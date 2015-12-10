@@ -3,8 +3,10 @@ import pprint
 import sys
 import time
 
+
 def get_console_dimensions():
     return os.popen('stty size', 'r').read().split()
+
 
 def format_timespan(seconds):
     m, s = divmod(seconds, 60)
@@ -14,7 +16,7 @@ def format_timespan(seconds):
 
 def format_filesize(bytes, decimal_digits=1):
     format_str = "%." + str(decimal_digits) + "f %sB"
-    for unit in ['','K','M','G','T','P','E','Z']:
+    for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
         if abs(bytes) < 1024.0:
             return format_str % (bytes, unit)
         bytes /= 1024.0
