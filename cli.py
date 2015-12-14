@@ -65,10 +65,10 @@ def cli_progress(filename,
             rate,
             remaining)
 
-    sys.stdout.write(output.ljust(int(columns)))
+    sys.stderr.write(output.ljust(int(columns)))
     if current_val == end_val:
-        sys.stdout.write('\n')
-    sys.stdout.flush()
+        sys.stderr.write('\n')
+    sys.stderr.flush()
 
 
 def pp(data):
